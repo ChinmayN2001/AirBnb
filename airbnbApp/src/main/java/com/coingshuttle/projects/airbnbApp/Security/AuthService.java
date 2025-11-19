@@ -5,6 +5,7 @@ import com.coingshuttle.projects.airbnbApp.Dto.SignUpRequestDto;
 import com.coingshuttle.projects.airbnbApp.Dto.UserDto;
 import com.coingshuttle.projects.airbnbApp.Entity.User;
 import com.coingshuttle.projects.airbnbApp.Entity.enums.Role;
+import com.coingshuttle.projects.airbnbApp.Exception.ResourceNotFoundException;
 import com.coingshuttle.projects.airbnbApp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -55,5 +56,12 @@ public class AuthService {
         arr[1] = jwtService.generateRefreshToken(user);
 
         return arr;
+    }
+
+    public String refreshToken(String refreshToken){
+        Long id = jwtService.getUserIdFromToken(refreshToken);
+
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id:" + id));
+        return jwtService.generateAccessToken(user);
     }
 }
